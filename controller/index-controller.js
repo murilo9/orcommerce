@@ -1,5 +1,5 @@
 var indexController = new Vue({
-    el: "exibe-anuncio",
+    el: "#exibe-anuncios",
     data: {},
     methods: {}
 });
