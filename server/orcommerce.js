@@ -33,3 +33,6 @@ app.listen(8888, function () {
         database: 'orcommerce'
     });
 });
+
+/* Router de Sesion */
+app.route('session')
