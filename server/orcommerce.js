@@ -34,13 +34,67 @@ app.listen(8888, function () {
     });
 });
 
+/* Router de Usuario */
+
+app.route('/usuario')
+.get(function(req, res){                                //------Usuario GET------
+    //TODO
+})
+.post(function(req, res){                               //------Usuario POST------
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    console.log('Recebeu POST ususario');
+    var funcao = req.body.funcao;
+    switch(funcao){
+        case 'create':              //------Usuario create
+            //Coleta os dados da request:
+            var email = req.body.email;
+            var nome = req.body.nome;
+            var senha = req.body.senha;
+            var estado = req.body.estado;
+            var cidade = req.body.cidade;
+            //Verifica se este email ja foi cadastrado:
+            var sql = "SELECT stEmail FROM tbUsuarios WHERE stEmail='"+email+"'";
+            pool.query(sql, function(err, result,fields){
+                if(err){        //Em caso de erro na execução da consulta
+                    console.log(err);
+                    res.status(500);    //Status: 500 internal server error
+                    res.end();                 
+                }else{
+                    if(result.length > 0){    //Se já houver um usuario com este email registrado
+                        res.status(400);    //Status 400 bad request
+                        res.end();
+                        return 0;
+                    }
+                }
+                //Caso o email não exista, fa o cadastro:
+                var sql = "INSERT INTO tbUsuarios VALUES ('"+email+"','"+senha+"','"+nome+"','"+estado+"','"+cidade+"')";
+                pool.query(sql, function(err, result, fields){
+                    if(err){        //Em caso de erro na execução da consulta
+                        console.log(err);
+                        res.status(500);    //Status: 500 internal server error           
+                    }
+                    res.end();
+                });
+            });
+            break;
+
+        case 'delete':              //------Usuario delete
+            //TODO
+            break;
+
+        default:
+            res.status(404);    //Status 404 not found
+            res.end();
+    }
+})
+
 /* Router de Session */
 
 app.route('/session')
 .get(function(req, res){                                //------Session GET------
     res.setHeader('Access-Control-Allow-Origin', '*');
     console.log('Recebeu GET session');
-    //Coleta os dados da request
+    //Coleta os dados da request:
     var sessionId = req.body.sessionId;
     var email = req.body.email;
     var now = new Date();
@@ -92,7 +146,7 @@ app.route('/session')
             break;
 
         case 'delete':          //------Session delete
-        console.log('session delete');
+            console.log('session delete');
             //Coleta os dados da request:
             console.log(req.body);
             var sessionId = req.body.sessionId;

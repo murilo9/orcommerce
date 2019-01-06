@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Orcommerce</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/estilo.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row" id="criarConta">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8">
+                <a href="index.html"><img src="img/orc-logo.png"></a>
+                <h2>Criar Conta</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="inputEmail">Email</label>
+                        <input type="text" class="form-control" v-model="create.email">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmaEmail">Confirmar Email</label>
+                        <input type="text" class="form-control" v-model="create.cEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputNome">Nome de Usuário</label>
+                        <input type="text" class="form-control" v-model="create.nome">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputSenha">Senha</label>
+                        <input type="password" class="form-control" v-model="create.senha">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmaSenha">Confirmar Senha</label>
+                        <input type="password" class="form-control" v-model="create.cSenha">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEstado">Estado</label>
+                        <select class="form-control" v-model="create.estado">
+                            <option v-for="estado in estados">{{estado.nome}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputCidade">Cidade</label>
+                        <input type="text" class="form-control" v-model="create.cidade">
+                    </div>
+                    <div style="text-align: center">
+                        <button type="button" class="btn btn-default" @click="validarFormulario">Finalizar</button>
+                    </form>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="controller/criar-conta-controller.js"></script>
+</body>
+</html>
