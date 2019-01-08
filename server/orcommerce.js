@@ -38,7 +38,51 @@ app.listen(8888, function () {
 
 app.route('/usuario')
 .get(function(req, res){                                //------Usuario GET------
-    //TODO
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    console.log('Recebeu GET ususario');
+    //Coleta os dados da request:
+    var sessionId = req.query.sessionId;
+    var email = req.query.email;
+    console.log('session recebida = '+sessionId+':'+email);   //--DEBUG
+    //Verifica se a session existe e se ela não expirou:
+    var sessionExists = false;
+    session.forEach(function(val, i){
+        var agora = new Date();
+        if(val.id == sessionId && val.email == email){    //Se a session id for encontrada e bater com o email
+            if(val.expire < agora){     //Se a sessão ainda não tiver expirado
+                sessionExists = true;   //Então a session existe
+                console.log('A session existe');
+            }else{        //Se a session tiver expirado
+                session.splice(i,i);    //Deleta esta session
+                console.log('A session não existe');
+            }
+        }
+    });
+    if(!sessionExists){     //Se a sessão não for válida
+        res.status(401);    //Status 401 unauthorized
+        res.end();
+    }else{      //Se a sessão for válida
+        //Coleta os dados do usuário no BD:
+        var sql = "SELECT * FROM tbUsuarios WHERE stEmail='"+email+"'";
+        pool.query(sql, function(err, result, fields){
+            if(err){        //Em caso de erro na execução da consulta
+                console.log(err);
+                res.status(500);    //Status: 500 internal server error
+                res.end();                 
+            }else{
+                if(result.length == 0){    //Se não houver um usuario com este email registrado
+                    res.status(400);    //Status 400 bad request
+                    res.end();
+                    return 0;
+                }else{      //Caso o usuário exista, evia os dados
+                    var nome = result[0].stUsername;
+                    var cidade = result[0].stCidade;
+                    var estado = result[0].stEstado;
+                    res.send({nome, cidade, estado});   //Envia o objeto na response
+                }
+            }
+        })
+    }
 })
 .post(function(req, res){                               //------Usuario POST------
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -101,7 +145,7 @@ app.route('/session')
     var found = 0;
     session.forEach(function(val, i){       //Percorre o array de session ids
         if(val.id == sessionId && val.email == email){
-            if(val.expire >= val.expire < now)      //Caso a session tenha expirado
+            if(val.expire < now)      //Caso a session tenha expirado
                 session.splice(i,i);
             else
                 found = 1;

@@ -33,9 +33,14 @@
                     </div>
                 </div>
             </form>
+            <ul class="nav navbar-nav">
+                <li v-if="logged">  <!--Criar Anúncio (v-if)-->
+                    <a href="criar-anuncio.html">Criar Anúncio</a>
+                </li>
+            </ul>
             <ul class="nav navbar-nav navbar-right" v-if="logged">      <!--CONTA/LOGOUT-->
                 <li>
-                    <a href="conta.html">TODO usuario de lugar</a>
+                    <a href="conta.html">{{usuario.nome}} de {{usuario.cidade}}, {{usuario.estado}}</a>
                 </li>
                 <li>
                     <a href="#" type="button" @click="fazerLogout">Logout</a>
