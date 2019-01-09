@@ -45,20 +45,9 @@ app.route('/usuario')
     var email = req.query.email;
     console.log('session recebida = '+sessionId+':'+email);   //--DEBUG
     //Verifica se a session existe e se ela não expirou:
-    var sessionExists = false;
-    session.forEach(function(val, i){
-        var agora = new Date();
-        if(val.id == sessionId && val.email == email){    //Se a session id for encontrada e bater com o email
-            if(val.expire < agora){     //Se a sessão ainda não tiver expirado
-                sessionExists = true;   //Então a session existe
-                console.log('A session existe');
-            }else{        //Se a session tiver expirado
-                session.splice(i,i);    //Deleta esta session
-                console.log('A session não existe');
-            }
-        }
-    });
-    if(!sessionExists){     //Se a sessão não for válida
+    var sessionValid = sessionVerif(sessionId, email);
+    console.log(sessionValid);
+    if(!sessionValid){     //Se a sessão não for válida
         res.status(401);    //Status 401 unauthorized
         res.end();
     }else{      //Se a sessão for válida
@@ -176,7 +165,7 @@ app.route('/session')
                     if(result[0].stSenha == senha){         //Caso o login seja válido
                         var id = Math.floor(Math.random()*99999999);     //Gera o session id
                         var expireDate = new Date();
-                        expireDate.setMinutes = expireDate.getDate + 20;    //Adiciona 20 min ao session expire time
+                        expireDate.setMinutes(expireDate.getMinutes() + 20);    //Adiciona 20 min ao session expire time
                         //Armazena esta session id com o expire date e o email no array de sessions do server:
                         session.push({id: id, expire: expireDate, email: email});
                         res.send({sessionId: id});      //Envia a response com a session id
@@ -213,3 +202,125 @@ app.route('/session')
     }
     
 });
+
+/* Router de anúncio */
+
+app.route('/anuncio')
+.get(function(req, res){        //------GET anuncio
+
+})
+.post(function(req, res){       //------POST anuncio
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    console.log('Recebeu POST anuncio');
+    var funcao = req.body.funcao;
+    switch(funcao){
+        case 'create':
+            //Coleta os dados da request:
+            var anuncioId = Math.floor(Math.random()*999999999);   //Gera uma id aleatória para o anúncio
+            var email = req.body.dono;
+            var sessionId = req.body.sessionId;
+            var nome = req.body.nome;
+            var descri = req.body.descri;
+            var categoria = req.body.categoria;
+            var foto = req.body.foto;
+            var cidade = req.body.cidade;
+            var estado = req.body.estado;
+            var preco = req.body.preco;
+            var qtd = req.body.qtd;
+            //Verifica se a sessão é válida:
+            if(!sessionVerif(sessionId, email)){   //Se a session for inválida
+                res.status(401);    //Status 401 unauthorized
+                res.end();
+            }else{      //Se a session for válida, procede
+                var sql = "INSERT INTO tbAnuncios"+
+                    "(itId, stDono, stNomeItem, stDescricao, stCategoria, stFoto, stCidade, stEstado, dcPreco, itEstoque) "+
+                    "VALUES("+anuncioId+",'"+email+"','"+nome+"','"+descri+"','"+categoria+"','"+foto+
+                            "','"+cidade+"','"+estado+"',"+preco+","+qtd+")";
+                //Tenta fazer a inserção no BD:
+                pool.query(sql, function(err, result, fields){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{      //Caso o insert seja bem-sucedido:
+                        //Envia a id do anúncio criado, que será usada no upload da foto:
+                        res.send({anuncioId: anuncioId});
+                        res.end();   
+                    }
+                });
+            }
+            break;
+        default:
+            res.status(404);    //Status 404 not found
+            res.end();
+    }
+})
+
+/* Router de anúncio-foto */
+
+app.route('/anuncio/foto')
+.post(function(req, res){
+    console.log('Recebeu POST anuncio/foto');
+    //Coleta os dados da request:
+    var sessionId = req.cookies.sessionId;
+    var email = req.cookies.email;
+    var anuncioId = req.cookies.anuncioCriado;
+    if(!sessionVerif(sessionId, email)){
+        res.status(401);    //Status 401 unauthorized
+        res.end();
+        return 0;
+    }
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files){       //Faz o parse da input file
+        if(err){
+            console.log('erro ao fazer upload de arquivo');
+            res.status(500);
+            res.end();
+            return 0;
+        }
+        var arquivoNome = files.iFoto.name;     //Pega o nome do arquivo
+        var serverPath = 'anuncios/_'+anuncioId+'/';     //define a pasta temporária no servidor
+        fs.mkdirSync(serverPath);    //Cria a pasta temporária no servidor
+        var oldPath = files.iFoto.path;     //Caminho de origem do arquivo
+        var newPath = serverPath + arquivoNome;     //Caminho de destino do arquivo = pasta no servidor + nome do arquivo
+        fs.rename(oldPath, newPath, function(err){      //Tenta mover o arquivo da origem pro destino
+            if(err){
+                console.log('Erro ao renomear o arquivo transferido');
+                res.status(500);
+                res.end();
+            }else{      //Caso o arquivo tenha sido transferido com sucesso
+                //Faz o update do anuncio no BD:
+                sql = "UPDATE tbAnuncios SET stFoto='"+arquivoNome+"' WHERE itId="+anuncioId;
+                pool.query(sql, function(err, result, fields){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{
+                        res.redirect('http://localhost/orcommerce/conta.html');
+                        res.end();
+                    }
+                });
+            }
+        })
+    });
+});
+
+function sessionVerif(sessionId, email){
+    var agora = new Date();
+    var i = 0;
+    found = false;
+    while(i<session.length && !found){       //Percorre o array de session
+        if(session[i].id == sessionId && session[i].email == email){      //Se achar a session
+            found = true;
+            if(session[i].expire < agora){     //Se a session tiver expirado
+                session.splice(i,i);    //Destrói a session
+                return false;       //Retorna false (sessão inválida)
+            }else
+                return true;    //Retorna true (sessão válida)
+        }
+        i+=1;
+    };
+    //Se percorreu todo o array sem achar a session
+    return 0;       //Retorna false (sessão não encontrada)
+}
