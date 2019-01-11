@@ -289,7 +289,7 @@ app.route('/anuncio')
                                 tmp.estado = result[i].stEstado;
                                 tmp.preco = result[i].dcPreco;
                                 tmp.estoque = result[i].itEstoque;
-                                anuncios.push(tmp);
+                                anuncios.push(tmp);     //Armazena este anúncio no array anuncios
                             });
                         }
                         res.send(anuncios);     //Envia o objeto anuncios na response
@@ -297,6 +297,31 @@ app.route('/anuncio')
                 });
             }
             break;
+        case 'ultimos':     //Select últimos 5 anúncios
+            //Faz a consulta ao BD:
+            var sql = "SELECT * FROM tbAnuncios LIMIT 5";
+            pool.query(sql, function(err, result, fidels){
+                if(err){
+                    console.log(err);
+                    res.status(500);
+                    res.end();
+                }else{
+                    var anuncios = [];
+                    result.forEach(function(val, i){    //Percorre o array de resultados
+                        var tmp = {id: '', nome: '', foto: '', cidade: '', estado: '', preco: ''};
+                        tmp.id = result[i].itId;
+                        tmp.nome = result[i].stNomeItem;
+                        tmp.foto = 'server/anuncios/_'+tmp.id+'/'+result[i].stFoto;
+                        tmp.cidade = result[i].stCidade;
+                        tmp.estado = result[i].stEstado;
+                        tmp.preco = result[i].dcPreco;
+                        anuncios.push(tmp);     //Armazena este anúncio no array anuncios
+                    });
+                    res.send(anuncios);     //Envia o array de anuncios na response
+                }
+            })
+            break;
+
         default:
             res.status(404);
             res.end();
