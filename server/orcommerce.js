@@ -43,10 +43,8 @@ app.route('/usuario')
     //Coleta os dados da request:
     var sessionId = req.query.sessionId;
     var email = req.query.email;
-    console.log('session recebida = '+sessionId+':'+email);   //--DEBUG
     //Verifica se a session existe e se ela não expirou:
     var sessionValid = sessionVerif(sessionId, email);
-    console.log(sessionValid);
     if(!sessionValid){     //Se a sessão não for válida
         res.status(401);    //Status 401 unauthorized
         res.end();
@@ -113,6 +111,54 @@ app.route('/usuario')
 
         case 'delete':              //------Usuario delete
             //TODO
+            break;
+
+        case 'update':              //------Usuario update
+            //Coleta os dados da request:
+            var email = req.body.email;
+            var sessionId = req.body.sessionId;
+            var username = req.body.username;
+            var senhaAtual = req.body.senhaAtual;
+            var senhaNova = req.body.senhaNova;
+            var cidade = req.body.cidade;
+            var estado = req.body.estado;
+            //Verifica se a session existe e se ela não expirou:
+            var sessionValid = sessionVerif(sessionId, email);
+            if(!sessionValid){     //Se a sessão não for válida
+                res.status(401);    //Status 401 unauthorized
+                res.end();
+            }else{
+                //Verifica se a senha atual está correta:
+                var sql = "SELECT stSenha FROM tbUsuarios WHERE stEmail='"+email+"'";
+                pool.query(sql, function(err, result, fields){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{
+                        if(result.length == 0){     //Caso o email não seja encontrado
+                            res.status(400);    //Status 400 bad request
+                            res.end()
+                        }else{      //Caso o email seja encontrado
+                            if(result[0].stSenha != senhaAtual){     //Se a senha atual estiver incorreta
+                                res.status(403);    //Status 403 forbidden
+                                res.end();
+                            }else{      //Caso a senha atual esteja correta
+                                //Faz o update dos dados do usuário no BD:
+                                var sql2 = "UPDATE tbUsuarios SET stUsername='"+username+"', stSenha='"+senhaNova+"', "+
+                                            "stCidade='"+cidade+"', stEstado='"+estado+"' WHERE stEmail='"+email+"'";
+                                pool.query(sql2, function(err, result, fields){
+                                    if(err){
+                                        console.log(err);
+                                        res.status(500);
+                                    }
+                                    res.end();
+                                });
+                            }
+                        }
+                    }
+                })
+            }
             break;
 
         default:
@@ -207,7 +253,54 @@ app.route('/session')
 
 app.route('/anuncio')
 .get(function(req, res){        //------GET anuncio
-
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    console.log('Recebeu GET anuncio');
+    var tipoConsulta = req.query.tipoConsulta;
+    switch(tipoConsulta){
+        case 'usuario':     //Select anuncios de um usuário
+            //Coleta os dados da request:
+            var sessionId = req.query.sessionId;
+            var email = req.query.email;
+            //Verifica se a session é válida:
+            if(!sessionVerif(sessionId, email)){
+                res.status(401);    //Status 401 unauthorized
+                res.end();
+            }else{
+                //Faz a consulta ao BD:
+                var sql = "SELECT * FROM tbAnuncios WHERE stDono='"+email+"'";
+                pool.query(sql, function(err, result, fields){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{
+                        var anuncios = [];
+                        if(result.length > 0){      //Se houver resultado
+                            result.forEach(function(val, i){    //Percorre o array de resultados
+                                var tmp = {id: '', nome: '', descri: '', categoria: '', foto: '',
+                                        data: '', cidade: '', estado: '', preco: '', estoque: ''};
+                                tmp.id = result[i].itId;
+                                tmp.nome = result[i].stNomeItem;
+                                tmp.descri = result[i].stDescricao;
+                                tmp.categoria = result[i].stCategoria;
+                                tmp.foto = 'server/anuncios/_'+tmp.id+'/'+result[i].stFoto;
+                                tmp.data = new Date(result[i].dtData);
+                                tmp.cidade = result[i].stCidade;
+                                tmp.estado = result[i].stEstado;
+                                tmp.preco = result[i].dcPreco;
+                                tmp.estoque = result[i].itEstoque;
+                                anuncios.push(tmp);
+                            });
+                        }
+                        res.send(anuncios);     //Envia o objeto anuncios na response
+                    }
+                });
+            }
+            break;
+        default:
+            res.status(404);
+            res.end();
+    }
 })
 .post(function(req, res){       //------POST anuncio
     res.setHeader('Access-Control-Allow-Origin', '*');
