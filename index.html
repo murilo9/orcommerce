@@ -75,6 +75,7 @@
     <div class="container" id="exibe-anuncios">     <!--CONTEÚDO-->
         <div class="row">
             <div class="col-sm-10">
+                <h2>Publicados recentemente:</h2>
                 <ul class="list-group" v-if="anuncios"> <!--Exibir os 5 anúncios mais recentes-->
                     <li class="list-group-item" v-for="anuncio in anuncios">
                         <div class="media">
@@ -84,7 +85,7 @@
                             <div class="media-body">    <!--TODO link para página do anúncio-->
                                 <div class="row">
                                     <div class="col-sm-10">
-                                        <h3>{{anuncio.nome}}</h3>
+                                        <a v-bind:href="anuncio.url"><h3>{{anuncio.nome}}</h3></a>
                                         <p>
                                             <span class="glyphicon glyphicon-map-marker"></span>
                                             {{anuncio.cidade}}, {{anuncio.estado}}

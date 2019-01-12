@@ -280,6 +280,7 @@ app.route('/anuncio')
                                 var tmp = {id: '', nome: '', descri: '', categoria: '', foto: '',
                                         data: '', cidade: '', estado: '', preco: '', estoque: ''};
                                 tmp.id = result[i].itId;
+                                tmp.url = 'anuncio.html?id='+tmp.id;
                                 tmp.nome = result[i].stNomeItem;
                                 tmp.descri = result[i].stDescricao;
                                 tmp.categoria = result[i].stCategoria;
@@ -297,6 +298,7 @@ app.route('/anuncio')
                 });
             }
             break;
+
         case 'ultimos':     //Select últimos 5 anúncios
             //Faz a consulta ao BD:
             var sql = "SELECT * FROM tbAnuncios LIMIT 5";
@@ -310,6 +312,7 @@ app.route('/anuncio')
                     result.forEach(function(val, i){    //Percorre o array de resultados
                         var tmp = {id: '', nome: '', foto: '', cidade: '', estado: '', preco: ''};
                         tmp.id = result[i].itId;
+                        tmp.url = 'anuncio.html?id='+tmp.id;
                         tmp.nome = result[i].stNomeItem;
                         tmp.foto = 'server/anuncios/_'+tmp.id+'/'+result[i].stFoto;
                         tmp.cidade = result[i].stCidade;
@@ -320,6 +323,44 @@ app.route('/anuncio')
                     res.send(anuncios);     //Envia o array de anuncios na response
                 }
             })
+            break;
+
+        case 'full':    //Select todos os dados de um anúncio específico
+            //Coleta os dados da request:
+            var anuncioId = req.query.id;
+            //Faz a consulta ao BD:
+            var sql = "SELECT A.itId AS id, A.stDono AS donoEmail, U.stUsername AS donoNome, "+
+                    "A.stNomeItem AS nome, A.stDescricao AS descri, A.stCategoria AS categ, "+
+                    "A.stFoto AS foto, A.dtData AS data, A.stCidade AS cidade, "+
+                    "A.stEstado AS estado, A.dcPreco AS preco, A.itEstoque AS estoque "+
+                    "FROM tbAnuncios A INNER JOIN tbUsuarios U ON A.stDono=U.stEmail WHERE A.itId="+anuncioId;
+            pool.query(sql, function(err, result, fields){
+                if(err){
+                    console.log(err);
+                    res.status(500);
+                    res.end();
+                }else{
+                    var anuncio = {id: '', donoEmail: '', donoNome: '', nome: '', descri: '', categ: '',
+                                    foto: '', data: '', cidade: '', estado: '', preco: '', estoque: ''};
+                    anuncio.id = result[0].id;
+                    anuncio.donoEmail = result[0].donoEmail;
+                    anuncio.donoNome = result[0].donoNome;
+                    anuncio.nome = result[0].nome;
+                    anuncio.descri = result[0].descri;
+                    anuncio.categoria = result[0].categ;
+                    anuncio.foto = 'server/anuncios/_'+anuncio.id+'/'+result[0].foto;
+                    anuncio.data = new Date(result[0].data);
+                    anuncio.cidade = result[0].cidade;
+                    anuncio.estado = result[0].estado;
+                    anuncio.preco = result[0].preco;
+                    anuncio.estoque = result[0].estoque;
+                    res.send(anuncio);      //Envia os dados do anúncio na response
+                }
+            });
+            break;
+        
+        case 'pesquisa':    //Select resultado de pesquisa
+            //TODO (a pesquisa pode ser só por nome ou incluir filtros de categoria, preço, lugar, etc)
             break;
 
         default:
