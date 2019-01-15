@@ -7,6 +7,34 @@
 .estilo-center{
     text-align: center;
 }
+.estilo-float-right{
+    float: right;
+}
+#chat-conteudo{
+    height: 200px;
+    overflow: scroll;
+}
+#chat-box{
+    width: 100%;
+}
+.mensagem-cliente{
+    display: inline-block;
+    width: 80%;
+    margin-bottom: 8px;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid gray;
+    color: gray;
+}
+.mensagem-vendedor{
+    display: inline-block;
+    width-max: 80%;
+    margin-bottom: 8px;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid gray;
+    color: gray;
+}
 .media-left img{
     max-width: 192px;
     max-height: 192px;

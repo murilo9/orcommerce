@@ -104,7 +104,24 @@
                                 Postado em {{getData(anuncio.data)}}<br>
                                 <span class="glyphicon glyphicon-map-marker"></span>
                                 {{anuncio.cidade}}, {{anuncio.estado}}
-                                <div>
+                                <div v-if="chat.ready">
+                                    <div class="panel panel-success">
+                                        <div class="panel-heading">
+                                            Chat com {{anuncio.donoNome}}
+                                            <a href="#" class="estilo-float-right" @click="desativarChat">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </a>
+                                        </div>
+                                        <div class="panel-body" id="chat-conteudo">
+                                            Carregando chat...
+                                        </div>
+                                        <div class="panel-footer estilo-center">
+                                            <textarea id="chat-box" rows="5"></textarea><br>
+                                            <button type="button" @click="enviarMensagem" class="btn btn-success">Enviar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else>
                                     <button type="button" class="btn btn-success" @click="iniciarChat">
                                         Iniciar Chat com Vendedor</button>
                                 </div>
