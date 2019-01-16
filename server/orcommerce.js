@@ -279,6 +279,7 @@ app.route('/anuncio')
                             result.forEach(function(val, i){    //Percorre o array de resultados
                                 var tmp = {id: '', nome: '', descri: '', categoria: '', foto: '',
                                         data: '', cidade: '', estado: '', preco: '', estoque: ''};
+                                //Colhe as propriedades:
                                 tmp.id = result[i].itId;
                                 tmp.url = 'anuncio.html?id='+tmp.id;
                                 tmp.nome = result[i].stNomeItem;
@@ -290,6 +291,9 @@ app.route('/anuncio')
                                 tmp.estado = result[i].stEstado;
                                 tmp.preco = result[i].dcPreco;
                                 tmp.estoque = result[i].itEstoque;
+                                //Propriedades cujos dados virão de outro lugar:
+                                tmp.chats = [];
+                                tmp.chatQtd = 0;
                                 anuncios.push(tmp);     //Armazena este anúncio no array anuncios
                             });
                         }
@@ -393,8 +397,8 @@ app.route('/anuncio')
             }else{      //Se a session for válida, procede
                 var sql = "INSERT INTO tbAnuncios"+
                     "(itId, stDono, stNomeItem, stDescricao, stCategoria, stFoto, stCidade, stEstado, dcPreco, itEstoque) "+
-                    "VALUES("+anuncioId+",'"+email+"','"+nome+"','"+descri+"','"+categoria+"','"+foto+
-                            "','"+cidade+"','"+estado+"',"+preco+","+qtd+")";
+                    "VALUES("+anuncioId+",'"+email+"','"+nome+"','"+descri+"','"+categoria+"','"+
+                                foto+"','"+cidade+"','"+estado+"',"+preco+","+qtd+")";
                 //Tenta fazer a inserção no BD:
                 pool.query(sql, function(err, result, fields){
                     if(err){
@@ -465,6 +469,55 @@ app.route('/anuncio/foto')
             }
         })
     });
+});
+
+/* Router de anúncio-chat */
+app.route('/anuncio/chat')
+.get(function(req, res){
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    console.log('Recebeu POST anuncio');
+    //Coleta os dados da request:
+    var anuncioId = req.query.anuncioId;
+    var sessionId = req.query.sessionId;
+    var email = req.query.email;
+    //Verifica se a session id é válida:
+    if(!sessionVerif(sessionId, email)){
+        res.status(401)     //Status 401 unauthorized
+        res.end();
+    }else{
+        //Pesquisa no BD o número de chats deste anúncio:
+        var sql = "SELECT COUNT(stUsuario) AS qtd FROM tbChat WHERE itAnuncio="+anuncioId;
+        pool.query(sql, function(err, result, fields){
+            if(err){
+                console.log(err);
+                res.status(500);
+                res.end();
+            }else{
+                var response = {qtd: '', chats: []};  //Declara o objeto que será enviado na response
+                response.qtd = result[0].qtd;   //Armazena o resultado do count em qtd
+                //Pega os dados de cada chat que este anúncio possui:
+                var sql2 = "SELECT C.itId AS chatId, C.stUsuario AS usuarioEmail, U.stUsername AS usuarioNome "+
+                            "FROM tbChat C INNER JOIN tbUsuarios U "+
+                            "ON C.stUsuario=U.stEmail WHERE itAnuncio="+anuncioId;
+                pool.query(sql2, function(err, result, fields){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{
+                        result.forEach(function(val, i){    //Percorre o array de results
+                            var chat = {id: '', usuarioEmail: '', usuarioNome: ''};     //Criar protótipo do objeto chat
+                            chat.id = result[i].chatId;    //Coleta a chat id
+                            chat.usuarioEmail = result[i].usuarioEmail;    //Coleta o email do usuario
+                            chat.usuarioNome = result[i].usuarioNome;  //Coleta a username do usuario
+                            response.chats.push(chat);   //Armazena o objeto chat temporário em response.chats
+                        });
+                        res.send(response);     //Envia o objeto na response
+                    }
+                });
+            }
+        });
+    }
 });
 
 /* Router de chat */

@@ -118,7 +118,7 @@
                         <div class="media-left">
                             <img v-bind:src="anuncio.foto">
                         </div>
-                        <div class="media-body">    <!--TODO link para página do anúncio-->
+                        <div class="media-body">
                             <div class="row">
                                 <div class="col-sm-8">
                                     <a v-bind:href="anuncio.url"><h3>{{anuncio.nome}}</h3></a>
@@ -131,8 +131,8 @@
                                     {{anuncio.cidade}}, {{anuncio.estado}}
                                 </div>
                             </div>
+                            <a href="#"><span class="badge">{{anuncio.chatQtd}}</span> Mensagens</a><br>
                             //TODO editar o anúncio
-                            <p>{{anuncio.descri}}</p>
                         </div>
                     </div>
                 </li>

@@ -76,6 +76,7 @@ var contaController = new Vue({
                 })
             }
         },
+
         getData: function(data){    //Retorna uma string formatada de uma data
             var anuncioData = new Date(data);
             var dia = anuncioData.getDate();
@@ -84,6 +85,11 @@ var contaController = new Vue({
             var hora = anuncioData.getHours();
             var minuto = anuncioData.getMinutes();
             return dia+'/'+mes+'/'+ano+' às '+hora+':'+minuto;
+        },
+
+        getAnuncioChats: function(anuncioId){
+            var self = this;    //Variável self para referenciar data
+            
         }
     },
     created: function(){     
@@ -128,6 +134,23 @@ var contaController = new Vue({
             success: function(res){
                 if(res.length > 0){    //Se houver resultados
                     self.anuncios = res;   //Passa os anúncios para data.anuncios
+                    //Pega os dados de chats de cada anúncio:
+                    self.anuncios.forEach(function(anuncio, i){
+                        $.ajax({
+                            url: 'http://localhost:8888/anuncio/chat?sessionId='+Cookies.get('sessionId')+
+                                    '&email='+Cookies.get('email')+'&anuncioId='+anuncio.id,
+                            method: 'get',
+                            statusCode: {
+                                500: function(){
+                                    alert('Erro no servidor. Tente novamente mais tarde.');
+                                }
+                            },
+                            success: function(res){
+                                anuncio.chatQtd = res.qtd;      //Guarda a qtd de chats que este anuncio tem
+                                anuncio.chats = res.chats;      //Guarda as informações de cada chat deste anúncio
+                            }
+                        })
+                    });
                 }
             }
         });
