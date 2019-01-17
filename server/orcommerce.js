@@ -305,7 +305,7 @@ app.route('/anuncio')
 
         case 'ultimos':     //Select últimos 5 anúncios
             //Faz a consulta ao BD:
-            var sql = "SELECT * FROM tbAnuncios LIMIT 5";
+            var sql = "SELECT * FROM tbAnuncios ORDER BY dtData DESC LIMIT 5";
             pool.query(sql, function(err, result, fidels){
                 if(err){
                     console.log(err);
@@ -413,6 +413,48 @@ app.route('/anuncio')
                 });
             }
             break;
+
+        case 'delete':
+            //Coleta os dados da request:
+            var anuncioId = req.body.anuncioId;
+            var dono = req.body.dono;
+            var sessionId = req.body.sessionId;
+            var email = req.body.email;
+            //Verifica se a session id é válida:
+            if(!sessionVerif(sessionId, email)){   //Se a session for inválida
+                res.status(401);    //Status 401 unauthorized
+                res.end();
+            }else{
+                //Deleta os chats do anúncio:
+                var sql = "DELETE FROM tbChat WHERE itAnuncio="+anuncioId;
+                pool.query(sql, function(err, result, fidels){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{
+                        //Deleta o anúncio:
+                        var sql2 = "DELETE FROM tbAnuncios WHERE stDono='"+dono+"' && itId="+anuncioId;
+                        pool.query(sql2, function(err, result, fields){
+                            if(err){
+                                console.log(err);
+                                res.status(500);
+                                res.end();
+                            }else{
+                                //"Apaga" os arquivos do servidor (coloca marcação OFF):
+                                fs.renameSync('anuncios/_'+anuncioId, 'anuncios/OFF_'+anuncioId, function(err){
+                                    if(err){
+                                        console.log(err);
+                                    }
+                                    res.end();
+                                });
+                            }
+                        });
+                    }
+                })
+            }
+            break;
+
         default:
             res.status(404);    //Status 404 not found
             res.end();
@@ -445,7 +487,7 @@ app.route('/anuncio/foto')
         var serverPath = 'anuncios/_'+anuncioId+'/';     //define a pasta do anuncio no servidor
         fs.mkdirSync(serverPath);    //Cria a pasta do anuncio no servidor
         var serverChatPath = serverPath+'chats/';   //Define a pasta onde ficarão os arquivos de chat
-        fs.mkdirSync(serverPath);    //Cria a pasta de chats do anuncio no servidor
+        fs.mkdirSync(serverChatPath);    //Cria a pasta de chats do anuncio no servidor
         var oldPath = files.iFoto.path;     //Caminho de origem do arquivo
         var newPath = serverPath + arquivoNome;     //Caminho de destino do arquivo = pasta no servidor + nome do arquivo
         fs.rename(oldPath, newPath, function(err){      //Tenta mover o arquivo da origem pro destino

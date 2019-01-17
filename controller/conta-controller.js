@@ -142,6 +142,30 @@ var contaController = new Vue({
                 $('#chat-conteudo').html(res);      //Coloca a response no innerHTML do chat-conteudo
                 $('.mensagem-vendedor').attr('style','text-align: right;');    //Ajusta o estilo das mensagens
             })
+        },
+
+        excluirAnuncio: function(id){
+            if(confirm('Tem certeza que deseja excluir este anúncio? Esta ação não pode ser desfeita.')){
+                //Faz a requisição de delete pro servidor:
+                $.ajax({
+                    url: 'http://localhost:8888/anuncio',
+                    method: 'post',
+                    data: {email: Cookies.get('email'), sessionId: Cookies.get('sessionId'),
+                            dono: Cookies.get('email'), anuncioId: id, funcao: 'delete'},
+                    statusCode: {
+                        401: function(){
+                            alert('Erro interno, tente novamente mais tarde.');
+                        },
+                        500: function(){
+                            alert('Erro no servidor, tente novamente mais tarde.');
+                        }
+                    },
+                    success: function(res){     //Em caso de sucesso
+                        alert('Anúncio excluído com sucesso.');
+                        location.reload();      //Atualiza a página
+                    }
+                });
+            }
         }
     },
 
