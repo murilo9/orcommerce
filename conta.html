@@ -113,7 +113,7 @@
             <h3 class="estilo-center">Seus itens anunciados</h3>
             <div class="col-sm-1"></div>
             <ul class="list-group col-sm-10">
-                <li class="list-group-item" v-for="anuncio in anuncios">
+                <li class="list-group-item" v-for="(anuncio, i) in anuncios">
                     <div class="media">
                         <div class="media-left">
                             <img v-bind:src="anuncio.foto">
@@ -128,15 +128,45 @@
                                     <span class="glyphicon glyphicon-calendar"></span>
                                     Postado em {{getData(anuncio.data)}}<br>
                                     <span class="glyphicon glyphicon-map-marker"></span>
-                                    {{anuncio.cidade}}, {{anuncio.estado}}
+                                    {{anuncio.cidade}}, {{anuncio.estado}}<br>
+                                    <div class="dropdown">
+                                        <a class="dropdown-toggle" data-toggle="dropdown">
+                                            <span class="badge">{{anuncio.chatQtd}}</span> Conversas
+                                        </a>
+                                        <ul class="dropdown-menu" role="menu" v-if="anuncio.chatQtd">
+                                            <li v-for="(chat, j) in anuncios[i].chats">
+                                                <a @click="ativarChat(i,j)">
+                                                    <span class="glyphicon glyphicon-user"></span>
+                                                    {{chat.usuarioNome}} iniciou um chat
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                            <a href="#"><span class="badge">{{anuncio.chatQtd}}</span> Mensagens</a><br>
-                            //TODO editar o anúncio
+                            //TODO editar o anúncio<br>
+                            //TODO atualizar estoque
                         </div>
                     </div>
                 </li>
             </ul>
+            <div v-if="chat.ready">     <!--Janela de chat-->
+                <div class="panel panel-success" id="vendedor-chat">
+                    <div class="panel-heading">
+                        Chat com {{chat.usuarioNome}}
+                        <a class="estilo-float-right" @click="desativarChat">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    </div>
+                    <div class="panel-body" id="chat-conteudo">
+                        Carregando chat...
+                    </div>
+                    <div class="panel-footer estilo-center">
+                        <textarea id="chat-box" rows="5"></textarea><br>
+                        <button type="button" @click="enviarMensagem" class="btn btn-success">Enviar</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div v-else>    <!--Se não houver anúncios(v-else)-->
             Você não tem nenhum anúncio publicado.

@@ -60,7 +60,7 @@ var anuncioController = new Vue({
             //Lê o arquivo _chatId no servidor:
             $.post("server/anuncios/_"+this.anuncio.id+"/chats/_"+this.chat.id+".html", '', function(res){
                 $('#chat-conteudo').html(res);      //Coloca a response no innerHTML do chat-conteudo
-                $('.mensagem-cliente').attr('style','float: right');    //Ajusta o estilo das mensagens
+                $('.mensagem-cliente').attr('style','text-align: right;');    //Ajusta o estilo das mensagens
             })
         },
 

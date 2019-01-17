@@ -30,6 +30,9 @@ var contaController = new Vue({
             {nome: 'Sergipe'},
             {nome: 'Tocantins'},
         ],
+        chat: {ready: false, time: 0, anuncioId: '', clienteEmail: '', clienteNome: ''},
+        chatRequest: {funcao: '', chatId: '', mensagem: '', ator: 'vendedor', anuncioId: '',
+                         sessionId: Cookies.get('sessionId'), email: Cookies.get('email')},
         usuario: { funcao: 'update', username: '', senhaAtual: '', senhaNova: '', senhaNovac: '', cidade: '', 
                     estado: '', email: Cookies.get('email'), sessionId: Cookies.get('sessionId') },
         anuncios: []
@@ -87,11 +90,61 @@ var contaController = new Vue({
             return dia+'/'+mes+'/'+ano+' às '+hora+':'+minuto;
         },
 
-        getAnuncioChats: function(anuncioId){
+        ativarChat: function(anuncioIndex, chatIndex){
             var self = this;    //Variável self para referenciar data
-            
+            this.chat.ready = true;     //Abre a janela do chat na view
+            this.chat.time = setInterval(function(){self.atualizarChat()},2000) //Ativa o atualziador de chat
+            //Passa os dados do chat deste anúncio para o objeto data.chat:
+            this.chat.id = this.anuncios[anuncioIndex].chats[chatIndex].id;
+            this.chat.clienteEmail = this.anuncios[anuncioIndex].chats[chatIndex].usuarioEmail;
+            this.chat.clienteNome = this.anuncios[anuncioIndex].chats[chatIndex].usuarioNome;
+            this.chat.anuncioId = this.anuncios[anuncioIndex].id;
+        },
+
+        desativarChat: function(){
+            this.chat.ready = false;
+        },
+
+        enviarMensagem: function(){
+            var self = this;    //Variável self para referenciar data
+            //Coloca os dados do chat no objeto de request:
+            this.chatRequest.funcao = 'update';     //Coloca função como update
+            this.chatRequest.chatId = this.chat.id;     //Coloca a chat id
+            this.chatRequest.anuncioId = this.chat.anuncioId;   //Coloca a id do anúncio
+            this.chatRequest.mensagem = $('#chat-box').val();   //Coloca a mensagem digitada em chatRequest
+            $('#chat-box').val('');     //Limpa o chat box
+            //Envia a request para o servidor:
+            $.ajax({
+                url: 'http://localhost:8888/chat',
+                method: 'post',
+                data: self.chatRequest,
+                statusCode: {
+                    500: function(){
+                        alert('Erro no servidor. Tente novamente mais tarde.');
+                    },
+                    400: function(){
+                        alert('Erro interno. Tente novamente mais tarde.');
+                    },
+                    401: function(res){
+                        alert('Sua sessão expirou, faça login novamente.');
+                        Cookies.set('logged', 'false');
+                    }
+                },
+                success: function(res){
+                    self.atualizarChat();   //Atualiza o chat
+                }
+            });
+        },
+
+        atualizarChat: function(){      //Atualiza o chat a cada 2s
+            //Lê o arquivo _chatId no servidor:
+            $.post("server/anuncios/_"+this.chat.anuncioId+"/chats/_"+this.chat.id+".html", '', function(res){
+                $('#chat-conteudo').html(res);      //Coloca a response no innerHTML do chat-conteudo
+                $('.mensagem-vendedor').attr('style','text-align: right;');    //Ajusta o estilo das mensagens
+            })
         }
     },
+
     created: function(){     
         var self = this;    //Variável self para referenciar data
         //Coleta as informações sobre o usuário no servidor:
