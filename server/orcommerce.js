@@ -282,6 +282,7 @@ app.route('/anuncio')
                                 //Colhe as propriedades:
                                 tmp.id = result[i].itId;
                                 tmp.url = 'anuncio.html?id='+tmp.id;
+                                tmp.urlmod = 'modificar-anuncio.html?id='+tmp.id;
                                 tmp.nome = result[i].stNomeItem;
                                 tmp.descri = result[i].stDescricao;
                                 tmp.categoria = result[i].stCategoria;
@@ -344,7 +345,7 @@ app.route('/anuncio')
                     res.status(500);
                     res.end();
                 }else{
-                    var anuncio = {id: '', donoEmail: '', donoNome: '', nome: '', descri: '', categ: '',
+                    var anuncio = {id: '', donoEmail: '', donoNome: '', nome: '', descri: '', categoria: '',
                                     foto: '', data: '', cidade: '', estado: '', preco: '', estoque: ''};
                     anuncio.id = result[0].id;
                     anuncio.donoEmail = result[0].donoEmail;
@@ -377,7 +378,7 @@ app.route('/anuncio')
     console.log('Recebeu POST anuncio');
     var funcao = req.body.funcao;
     switch(funcao){
-        case 'create':
+        case 'create':          //-----Anúncio Create
             //Coleta os dados da request:
             var anuncioId = Math.floor(Math.random()*999999999);   //Gera uma id aleatória para o anúncio
             var email = req.body.dono;
@@ -414,7 +415,7 @@ app.route('/anuncio')
             }
             break;
 
-        case 'delete':
+        case 'delete':      //-----Anúncio Delete
             //Coleta os dados da request:
             var anuncioId = req.body.anuncioId;
             var dono = req.body.dono;
@@ -450,6 +451,39 @@ app.route('/anuncio')
                                 });
                             }
                         });
+                    }
+                })
+            }
+            break;
+
+        case 'update':      //-----Anúncio Update
+            //Coleta os dados da request:
+            var sessionId = req.body.sessionId;
+            var email = req.body.email;
+            var anuncioId = req.body.anuncio.id;
+            var nome = req.body.anuncio.nome;
+            var descri = req.body.anuncio.descri;
+            var categ = req.body.anuncio.categ;
+            var cidade = req.body.anuncio.cidade;
+            var estado = req.body.anuncio.estado;
+            var preco = req.body.anuncio.preco;
+            var estoque = req.body.anuncio.estoque;
+            //Verifica se a session id é válida:
+            if(!sessionVerif(sessionId, email)){   //Se a session for inválida
+                res.status(401);    //Status 401 unauthorized
+                res.end();
+            }else{
+                //Faz o update no BD:
+                var sql = "UPDATE tbAnuncios SET stNomeItem='"+nome+"', stDescricao='"+descri+"', "+
+                            "stCategoria='"+categ+"', stCidade='"+cidade+"', stEstado='"+estado+"', "+
+                            "dcPreco="+preco+", itEstoque="+estoque+" WHERE itId="+anuncioId+" && stDono='"+email+"'";
+                pool.query(sql, function(err, result, fields){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{
+                        res.end();
                     }
                 })
             }
