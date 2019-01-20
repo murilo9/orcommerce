@@ -26,13 +26,13 @@
 }
 .mensagem-cliente{
     display: block;
-    width: 80%;
+    width: 100%;
     padding: 4px;
     color: gray;
 }
 .mensagem-vendedor{
     display: block;
-    width: 80%;
+    width: 100%;
     padding: 4px;
     color: gray;
 }

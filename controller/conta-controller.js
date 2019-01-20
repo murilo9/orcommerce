@@ -140,7 +140,9 @@ var contaController = new Vue({
             //Lê o arquivo _chatId no servidor:
             $.post("server/anuncios/_"+this.chat.anuncioId+"/chats/_"+this.chat.id+".html", '', function(res){
                 $('#chat-conteudo').html(res);      //Coloca a response no innerHTML do chat-conteudo
-                $('.mensagem-vendedor').attr('style','text-align: right;');    //Ajusta o estilo das mensagens
+                //Ajusta o estilo das mensagens
+                $('.mensagem-vendedor').attr('style','text-align: right; padding-left: 24px;');    
+                $('.mensagem-cliente').attr('style','padding-right: 24px; color: green;');
             })
         },
 
