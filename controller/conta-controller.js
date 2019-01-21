@@ -35,7 +35,8 @@ var contaController = new Vue({
                          sessionId: Cookies.get('sessionId'), email: Cookies.get('email')},
         usuario: { funcao: 'update', username: '', senhaAtual: '', senhaNova: '', senhaNovac: '', cidade: '', 
                     estado: '', email: Cookies.get('email'), sessionId: Cookies.get('sessionId') },
-        anuncios: []
+        anunciosCriados: [],
+        anunciosIniciados: []
     },
     methods: {
         atualizar: function(){
@@ -95,10 +96,10 @@ var contaController = new Vue({
             this.chat.ready = true;     //Abre a janela do chat na view
             this.chat.time = setInterval(function(){self.atualizarChat()},2000) //Ativa o atualziador de chat
             //Passa os dados do chat deste anúncio para o objeto data.chat:
-            this.chat.id = this.anuncios[anuncioIndex].chats[chatIndex].id;
-            this.chat.clienteEmail = this.anuncios[anuncioIndex].chats[chatIndex].usuarioEmail;
-            this.chat.clienteNome = this.anuncios[anuncioIndex].chats[chatIndex].usuarioNome;
-            this.chat.anuncioId = this.anuncios[anuncioIndex].id;
+            this.chat.id = this.anunciosCriados[anuncioIndex].chats[chatIndex].id;
+            this.chat.clienteEmail = this.anunciosCriados[anuncioIndex].chats[chatIndex].usuarioEmail;
+            this.chat.clienteNome = this.anunciosCriados[anuncioIndex].chats[chatIndex].usuarioNome;
+            this.chat.anuncioId = this.anunciosCriados[anuncioIndex].id;
         },
 
         desativarChat: function(){
@@ -212,9 +213,9 @@ var contaController = new Vue({
             },
             success: function(res){
                 if(res.length > 0){    //Se houver resultados
-                    self.anuncios = res;   //Passa os anúncios para data.anuncios
+                    self.anunciosCriados = res;   //Passa os anúncios para data.anuncios
                     //Pega os dados de chats de cada anúncio:
-                    self.anuncios.forEach(function(anuncio, i){
+                    self.anunciosCriados.forEach(function(anuncio, i){
                         $.ajax({
                             url: 'http://localhost:8888/anuncio/chat?sessionId='+Cookies.get('sessionId')+
                                     '&email='+Cookies.get('email')+'&anuncioId='+anuncio.id,
@@ -233,5 +234,18 @@ var contaController = new Vue({
                 }
             }
         });
+        //Colhe do servidor os anúncios que este usuário começou um chat
+        $.ajax({
+            url: 'http://localhost:8888/anuncio?tipoConsulta=iniciados&email='+Cookies.get('email'),
+            method: 'get',
+            statusCode: {
+                500: function(){
+                    alert('Erro no servidor. Tente novamente mais tarde.');
+                }
+            },
+            success: function(res){     //Em caso de sucesso
+                self.anunciosIniciados = res;   //Coloca a response no array anunciosIniciados
+            }
+        })
     }
 });

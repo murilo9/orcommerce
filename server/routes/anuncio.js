@@ -125,6 +125,38 @@ module.exports = function(app, sessionVerif){
                 });
                 break;
             
+            case 'iniciados':     //Select todos os anúncios que o usuário iniciou um chat
+                //Coleta os dados da request:
+                var email = req.query.email;
+                //Faz a consulta ao BD:
+                var sql = "SELECT a.itId AS id, A.stNomeItem AS nome, A.dcPreco AS preco, "+
+                            "A.stCidade AS cidade, A.stEstado AS estado, A.stFoto AS foto "+
+                            "FROM tbAnuncios A INNER JOIN tbChat C "+
+                            "ON C.itAnuncio = A.itId WHERE C.stUsuario='"+email+"'";
+                pool.query(sql, function(err, result, fields){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{
+                        var anuncios = [];
+                        result.forEach(function(val, i){
+                            var anuncio = {id: '', nome: '', foto: '', cidade: '', estado: '', preco: ''};
+                            //Coleta os dados de result
+                            anuncio.id = result[i].id;
+                            anuncio.nome = result[i].nome;
+                            anuncio.url = 'anuncio.html?id='+anuncio.id;
+                            anuncio.foto = 'server/anuncios/_'+anuncio.id+'/'+result[i].foto;
+                            anuncio.cidade = result[i].cidade;
+                            anuncio.estado = result[i].estado;
+                            anuncio.preco = result[i].preco;
+                            anuncios.push(anuncio);     //Insere este anúncio no array de anúncios
+                        })
+                        res.send(anuncios);     //Envia o array com os anúncios na response
+                    }
+                });
+                break;
+
             case 'pesquisa':    //Select resultado de pesquisa
                 //TODO (a pesquisa pode ser só por nome ou incluir filtros de categoria, preço, lugar, etc)
                 break;

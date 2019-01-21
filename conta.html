@@ -109,11 +109,11 @@
                 //TODO deletar conta
             </form>
         </div>
-        <div class="row" v-if="anuncios.length">    <!--Se houver anúncios(v-if)-->
+        <div class="row" v-if="anunciosCriados">    <!--Se houver anúncios(v-if)-->
             <h3 class="estilo-center">Seus itens anunciados</h3>
             <div class="col-sm-1"></div>
             <ul class="list-group col-sm-10">
-                <li class="list-group-item" v-for="(anuncio, i) in anuncios">
+                <li class="list-group-item" v-for="(anuncio, i) in anunciosCriados">
                     <div class="media">
                         <div class="media-left">
                             <img v-bind:src="anuncio.foto">
@@ -170,7 +170,37 @@
             </div>
         </div>
         <div v-else>    <!--Se não houver anúncios(v-else)-->
-            Você não tem nenhum anúncio publicado.
+            <h3>Você não tem nenhum anúncio publicado.</h3>
+        </div>
+
+        <div v-if="anunciosIniciados">  <!--Anúncios que o usuário iniciou um chat (v-if)-->
+            <h3 class="estilo-center">Itens que você iniciou uma conversa</h3>
+            <div class="col-sm-1"></div>
+            <ul class="list-group col-sm-10">
+                <li class="list-group-item" v-for="(anuncio, i) in anunciosIniciados">
+                    <div class="media">
+                        <div class="media-left">
+                            <img v-bind:src="anuncio.foto">
+                        </div>
+                        <div class="media-body">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <a v-bind:href="anuncio.url"><h3>{{anuncio.nome}}</h3></a>
+                                    <h4>R$ {{anuncio.preco}}</h4>
+                                    TODO encerrar chat
+                                </div>
+                                <div class="col-sm-4">
+                                    <span class="glyphicon glyphicon-map-marker"></span>
+                                    {{anuncio.cidade}}, {{anuncio.estado}}<br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div v-else>    <!--Caso não hajam anúncios que o usuário iniciou chat (v-else)-->
+            <h3>Você não iniciou uma conversa em nenhum anúncio.</h3>
         </div>
     </div>
 
