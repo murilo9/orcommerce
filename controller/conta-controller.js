@@ -39,8 +39,9 @@ var contaController = new Vue({
         anunciosIniciados: []
     },
     methods: {
-        atualizar: function(){
+        atualizarConta: function(){
             var self = this;    //Variável self para referneciar data
+            this.usuario.funcao = 'update';     //Seleciona a função CRUD update
             //Valida o campo de nome:
             if(this.usuario.username.length < 3 || this.usuario.username.length > 40){
                 alert('O nome de usuario deve conter entre 3 e 40 caracteres.');
@@ -76,6 +77,34 @@ var contaController = new Vue({
                     success: function(res){
                         alert('Dados alterados com sucesso.');
                         location.reload();
+                    }
+                })
+            }
+        },
+
+        deletarConta: function(){
+            var self = this;    //Variável self para referenciar data
+            this.usuario.funcao = 'delete';     //Seleciona a função CRUD delete
+            if(confirm('Deseja mesmo deletar sua conta? Esta ação não poderá ser desfeita.')){
+                this.usuario.senhaAtual = prompt('Digite sua senha para prosseguir');
+                //Faz a requisição ao servidor:
+                $.ajax({
+                    url: 'http://localhost:8888/usuario',
+                    method: 'post',
+                    data: self.usuario,
+                    statusCode: {
+                        500: function(){
+                            alert('Erro no servidor, tente novamente mais tarde.');
+                        },
+                        401: function(){
+                            alert('Senha incorreta.');
+                            self.usuario.senhaAtual = '';
+                        }
+                    },
+                    success: function(res){
+                        alert('Conta deleta com sucesso. Esperamos que tenha aproveitado nossos serviços ;)');
+                        Cookies.set('logged', 'false');     //Desloga
+                        location.href='index.html';     //Redireciona
                     }
                 })
             }
@@ -213,7 +242,7 @@ var contaController = new Vue({
             },
             success: function(res){
                 if(res.length > 0){    //Se houver resultados
-                    self.anunciosCriados = res;   //Passa os anúncios para data.anuncios
+                    self.anunciosCriados = res;   //Passa os anúncios para data.anunciosCriados
                     //Pega os dados de chats de cada anúncio:
                     self.anunciosCriados.forEach(function(anuncio, i){
                         $.ajax({

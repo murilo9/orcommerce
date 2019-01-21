@@ -104,12 +104,12 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-success" @click="atualizar">Atualizar Dados</button>
+                    <button type="button" class="btn btn-success" @click="atualizarConta">Atualizar Dados</button>
+                    <button type="button" class="btn btn-warning" @click="deletarConta">Deletar Conta</button>
                 </div>
-                //TODO deletar conta
             </form>
         </div>
-        <div class="row" v-if="anunciosCriados">    <!--Se houver anúncios(v-if)-->
+        <div class="row" v-if="anunciosCriados.length > 0">    <!--Se houver anúncios(v-if)-->
             <h3 class="estilo-center">Seus itens anunciados</h3>
             <div class="col-sm-1"></div>
             <ul class="list-group col-sm-10">
@@ -134,7 +134,7 @@
                                             <span class="badge">{{anuncio.chatQtd}}</span> Conversas
                                         </a>
                                         <ul class="dropdown-menu" role="menu" v-if="anuncio.chatQtd">
-                                            <li v-for="(chat, j) in anuncios[i].chats">
+                                            <li v-for="(chat, j) in anunciosCriados[i].chats">
                                                 <a @click="ativarChat(i,j)">
                                                     <span class="glyphicon glyphicon-user"></span>
                                                     {{chat.usuarioNome}} iniciou um chat
@@ -170,10 +170,10 @@
             </div>
         </div>
         <div v-else>    <!--Se não houver anúncios(v-else)-->
-            <h3>Você não tem nenhum anúncio publicado.</h3>
+            <h4 class="estilo-center">Você não tem nenhum anúncio publicado.</h4>
         </div>
 
-        <div v-if="anunciosIniciados">  <!--Anúncios que o usuário iniciou um chat (v-if)-->
+        <div v-if="anunciosIniciados.length > 0">  <!--Anúncios que o usuário iniciou um chat (v-if)-->
             <h3 class="estilo-center">Itens que você iniciou uma conversa</h3>
             <div class="col-sm-1"></div>
             <ul class="list-group col-sm-10">
@@ -200,7 +200,7 @@
             </ul>
         </div>
         <div v-else>    <!--Caso não hajam anúncios que o usuário iniciou chat (v-else)-->
-            <h3>Você não iniciou uma conversa em nenhum anúncio.</h3>
+            <h4 class="estilo-center">Você não iniciou uma conversa em nenhum anúncio.</h4>
         </div>
     </div>
 
