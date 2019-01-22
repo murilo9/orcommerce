@@ -105,7 +105,7 @@
                 </div>
                 <div class="form-group">
                     <button type="button" class="btn btn-success" @click="atualizarConta">Atualizar Dados</button>
-                    <button type="button" class="btn btn-warning" @click="deletarConta">Deletar Conta</button>
+                    <button type="button" class="btn btn-danger" @click="deletarConta">Deletar Conta</button>
                 </div>
             </form>
         </div>
@@ -187,7 +187,7 @@
                                 <div class="col-sm-8">
                                     <a v-bind:href="anuncio.url"><h3>{{anuncio.nome}}</h3></a>
                                     <h4>R$ {{anuncio.preco}}</h4>
-                                    TODO encerrar chat
+                                    <button type="button" class="btn btn-warning" @click="encerrarChat(anuncio.id)">Encerrar Conversa</button>
                                 </div>
                                 <div class="col-sm-4">
                                     <span class="glyphicon glyphicon-map-marker"></span>

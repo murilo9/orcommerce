@@ -198,6 +198,34 @@ var contaController = new Vue({
                     }
                 });
             }
+        },
+
+        encerrarChat: function(anuncioId){
+            var msg = 'Isso irá apagar toda a conversa com o vendedor desde item e removerá '+
+                        'o anúncio desta lista. Deseja mesmo encerrar o chat?';
+            var self = this;    //Variável self para referenciar data
+            this.chatRequest.funcao = 'delete';     //Seleciona a função CRUD delete
+            this.chatRequest.anuncioId = anuncioId;
+            if(confirm(msg)){
+                //Faz a reequisição pro servidor:
+                $.ajax({
+                    url: 'http://localhost:8888/chat',
+                    method: 'post',
+                    data: self.chatRequest,
+                    statusCode: {
+                        500: function(){
+                            alert('Erro no servidor. Tente novamente mais tarde.');
+                        },
+                        401: function(){
+                            alert('Sua sessão expirou, faça login novamente.');
+                            Cookies.set('logged', 'false');     //Desloga
+                        }
+                    },
+                    success: function(res){
+                        location.reload();      //Atualiza a página
+                    }
+                })
+            }
         }
     },
 

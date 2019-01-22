@@ -111,7 +111,30 @@ module.exports = function(app, sessionVerif){
                     });
                 }
                 break;
-    
+            
+            case 'delete':
+                //Coleta os dados da request:
+                var sessionId = req.body.sessionId;
+                var email = req.body.email;
+                var anuncioId = req.body.anuncioId;
+                //Verifica se a session id é válida:
+                if(!sessionVerif(sessionId, email)){
+                    res.status(401);    //Status 401 unauthorized
+                    res.end();
+                }else{
+                    //Faz o delete no BD:
+                    var sql = "DELETE FROM tbChat WHERE stUsuario='"+email+"' && itAnuncio="+anuncioId;
+                    pool.query(sql, function(err, result, fields){
+                        if(err){
+                            console.log(err);
+                            res.status(500);
+                        }else{
+                            res.end();
+                        }
+                    });
+                }
+                break;
+
             default:
                 res.status(404);
                 res.end();
