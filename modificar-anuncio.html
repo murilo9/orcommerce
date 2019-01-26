@@ -11,8 +11,11 @@
     <link rel="stylesheet" type="text/css" href="css/estilo.css">
 </head>
 <body>
-        <div class="container" id="app"><!--CONTEÚDO-->
-            <menu-navbar></menu-navbar> <!--Navbar-->
+    <div id="app">
+        <div class="container-fluid"> <!--NAVBAR-->
+            <menu-navbar></menu-navbar>
+        </div>
+        <div class="container"><!--CONTEÚDO-->
             <h3 class="estilo-center">Modificar Anúncio</h3>
             <div class="row">
                 <div class="col-sm-3"></div>
@@ -58,7 +61,7 @@
                 </div>
             </div>
         </div>
-
+    </div>
     <script src="controller/menu-controller.js"></script>
     <script src="controller/modificar-anuncio-controller.js"></script>
 </body>

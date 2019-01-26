@@ -21,9 +21,11 @@
     </style>
 </head>
 <body>
-
-        <div class="container" id="app"><!--CONTEÚDO-->
-            <menu-navbar></menu-navbar> <!--Navbar-->
+    <div id="app">
+        <div class="container-fluid">
+                <menu-navbar></menu-navbar> <!--Navbar-->
+        </div>
+        <div class="container"><!--CONTEÚDO-->
             <div class="row">
                 <div class="col-sm-1"></div>
                 <div class="panel panel-success col-sm-10">
@@ -73,7 +75,7 @@
                 </div>
             </div>
         </div>
-
+    </div>
     <script src="controller/menu-controller.js"></script>
     <script src="controller/anuncio-controller.js"></script>
 </body>

@@ -11,93 +11,96 @@
     <link rel="stylesheet" type="text/css" href="css/estilo.css">
 </head>
 <body>
-    <div class="container" id="app">     <!--CONTEÚDO-->
-        <menu-navbar></menu-navbar> <!--Navbar-->
-        <h2 class="estilo-center">Criar Anúncio</h2>
-        <div class="row">
-            <div class="col-sm-2"></div>
-            <div class="col-sm-8" id='confirmTable'>  <!--VALIDADO (v-else)-->
-                <h3>Confirmar dados do anúncio:</h3>
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <td>Item</td>
-                            <td>{{anuncio.nome}}</td>
-                        </tr>
-                        <tr>
-                            <td>Descrição</td>
-                            <td>{{anuncio.descri}}</td>
-                        </tr>
-                        <tr>
-                            <td>Categoria</td>
-                            <td>{{anuncio.categoria}}</td>
-                        </tr>
-                        <tr>
-                            <td>Valor</td>
-                            <td>{{anuncio.preco}}</td>
-                        </tr>
-                        <tr>
-                            <td>Quantidade</td>
-                            <td>{{anuncio.qtd}}</td>
-                        </tr>
-                        <tr>
-                            <td>Cidade</td>
-                            <td>{{anuncio.cidade}}, {{anuncio.estado}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="estilo-center">
-                    <button class="btn btn-default" @click="reeditarAnuncio">Reeditar</button>
-                    <button class="btn btn-success" @click="criarAnuncio">Anunciar</button>
+    <div id="app">
+        <div class="container-fluid"> <!--NAVBAR-->
+            <menu-navbar></menu-navbar>
+        </div>
+        <div class="container">     <!--CONTEÚDO-->
+            <h2 class="estilo-center">Criar Anúncio</h2>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8" id='confirmTable'>  <!--VALIDADO (v-else)-->
+                    <h3>Confirmar dados do anúncio:</h3>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Item</td>
+                                <td>{{anuncio.nome}}</td>
+                            </tr>
+                            <tr>
+                                <td>Descrição</td>
+                                <td>{{anuncio.descri}}</td>
+                            </tr>
+                            <tr>
+                                <td>Categoria</td>
+                                <td>{{anuncio.categoria}}</td>
+                            </tr>
+                            <tr>
+                                <td>Valor</td>
+                                <td>{{anuncio.preco}}</td>
+                            </tr>
+                            <tr>
+                                <td>Quantidade</td>
+                                <td>{{anuncio.qtd}}</td>
+                            </tr>
+                            <tr>
+                                <td>Cidade</td>
+                                <td>{{anuncio.cidade}}, {{anuncio.estado}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="estilo-center">
+                        <button class="btn btn-default" @click="reeditarAnuncio">Reeditar</button>
+                        <button class="btn btn-success" @click="criarAnuncio">Anunciar</button>
+                    </div>
+                </div>
+                <div class="col-sm-8" id="anuncioCreate">   <!--(v-else)-->
+                    <form method='post' action="http://localhost:8888/anuncio/foto" enctype="multipart/form-data" id="anuncioForm">  <!--NÃO VALIDADO (v-else)-->
+                        <div class="form-group">
+                            <label for="iItem">O que você deseja vender?</label>
+                            <input type="text" class="form-control" id="iItem" name="iFoto" v-model="anuncio.nome">
+                        </div>
+                        <div class="form-group">
+                            <label for="iFoto">Adicione uma foto:</label>
+                            <input type="file" name="iFoto" id="iFoto">
+                        </div>
+                        <div class="form-group">
+                            <label for="iDescri">Adicione uma descrição:</label>
+                            <textarea class="form-control" rows="8" id="iDescri" v-model="anuncio.descri"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="iCategoria">Escolha a categoria do item:</label>
+                            <select class="form-control" id="iCategoria" v-model="anuncio.categoria">
+                                <option v-bind:value="categoria.nome" v-for="categoria in categorias">{{categoria.nome}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="iPreco">Digite o valor do item (formato rrrr.cc):</label>
+                            <input type="text" class="form-control" id="iPreco" v-model="anuncio.preco">
+                        </div>
+                        <div class="form-group">
+                            <label for="iQtd">Quantos itens você está colocando à venda?</label>
+                            <input type="text" class="form-control" id="iQtd" v-model="anuncio.qtd">
+                        </div>
+                        <div class="form-group">
+                            <label for="iCidade">Em que cidade este item será anuncidado para venda?</label>
+                            <input type="text" class="form-control" id="iCidade" v-model="anuncio.cidade">
+                        </div>
+                        <div class="form-group">
+                            <label for="iEstado">Insira o Estado:</label>
+                            <select class="form-control" id="iEstado" v-model="anuncio.estado">
+                                <option v-bind:value="estado.nome" v-for="estado in estados">{{estado.nome}}</option>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="estilo-center">
+                        <button class="btn btn-success estilo-center" @click="validarAnuncio">Continuar</button>
+                    </div><br><br><br>
                 </div>
             </div>
-            <div class="col-sm-8" id="anuncioCreate">   <!--(v-else)-->
-                <form method='post' action="http://localhost:8888/anuncio/foto" enctype="multipart/form-data" id="anuncioForm">  <!--NÃO VALIDADO (v-else)-->
-                    <div class="form-group">
-                        <label for="iItem">O que você deseja vender?</label>
-                        <input type="text" class="form-control" id="iItem" name="iFoto" v-model="anuncio.nome">
-                    </div>
-                    <div class="form-group">
-                        <label for="iFoto">Adicione uma foto:</label>
-                        <input type="file" name="iFoto" id="iFoto">
-                    </div>
-                    <div class="form-group">
-                        <label for="iDescri">Adicione uma descrição:</label>
-                        <textarea class="form-control" rows="8" id="iDescri" v-model="anuncio.descri"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="iCategoria">Escolha a categoria do item:</label>
-                        <select class="form-control" id="iCategoria" v-model="anuncio.categoria">
-                            <option v-bind:value="categoria.nome" v-for="categoria in categorias">{{categoria.nome}}</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="iPreco">Digite o valor do item (formato rrrr.cc):</label>
-                        <input type="text" class="form-control" id="iPreco" v-model="anuncio.preco">
-                    </div>
-                    <div class="form-group">
-                        <label for="iQtd">Quantos itens você está colocando à venda?</label>
-                        <input type="text" class="form-control" id="iQtd" v-model="anuncio.qtd">
-                    </div>
-                    <div class="form-group">
-                        <label for="iCidade">Em que cidade este item será anuncidado para venda?</label>
-                        <input type="text" class="form-control" id="iCidade" v-model="anuncio.cidade">
-                    </div>
-                    <div class="form-group">
-                        <label for="iEstado">Insira o Estado:</label>
-                        <select class="form-control" id="iEstado" v-model="anuncio.estado">
-                            <option v-bind:value="estado.nome" v-for="estado in estados">{{estado.nome}}</option>
-                        </select>
-                    </div>
-                </form>
-                <div class="estilo-center">
-                    <button class="btn btn-success estilo-center" @click="validarAnuncio">Continuar</button>
-                </div><br><br><br>
-            </div>
+            
         </div>
-        
     </div>
-
     <script src="controller/menu-controller.js"></script>
     <script src="controller/criar-anuncio-controller.js"></script>
 </body>
