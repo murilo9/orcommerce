@@ -3,6 +3,21 @@ Vue.component('menu-navbar',{
         logged: false,
         usuario: {nome: '', cidade: '', estado: ''},
         login: {funcao: 'create', email: '', senha: ''} , 
+        pesquisa: {categoria: 'Categorias', estado: 'Estado', cidade: 'Cidade', item: ''},
+        categorias: [
+            {nome: 'Animais de Estimação'}, {nome: 'Eletrodomésticos'}, {nome: 'Eletrônicos e Informática'},
+            {nome: 'Esportes, Hobbies e Lazer'}, {nome: 'Imóveis'}, {nome: 'Móveis e Decoração'},
+            {nome: 'Veículos'}, {nome: 'Vestuário e Moda'}
+        ],
+        estados: [
+            {nome: 'Acre'}, {nome: 'Alagoas'}, {nome: 'Amapá'}, {nome: 'Amazonas'},
+            {nome: 'Bahia'}, {nome: 'Ceará'}, {nome: 'Distrito Federal'}, {nome: 'Espírito Santo'},
+            {nome: 'Goiás'}, {nome: 'Maranhão'}, {nome: 'Mato Grosso'}, {nome: 'Mato Grosso do Sul'},
+            {nome: 'Minas Gerais'}, {nome: 'Pará'}, {nome: 'Paraíba'}, {nome: 'Paraná'},
+            {nome: 'Pernambuco'}, {nome: 'Piauí'}, {nome: 'Rio de Janeiro'}, {nome: 'Rio Grande do Norte'},
+            {nome: 'Rio Grande do Sul'}, {nome: 'Rondônia'}, {nome: 'Roraima'}, {nome: 'Santa Catarina'},
+            {nome: 'São Paulo'}, {nome: 'Sergipe'}, {nome: 'Tocantins'},
+        ]
     }},
     methods: {
         fazerLogin: function(){       //Função de fazer login
@@ -26,6 +41,7 @@ Vue.component('menu-navbar',{
                 }
             });
         },
+
         fazerLogout: function(){        //Função de fazer logout
             var self = this;        //Variável self para referenciar data
             $.ajax({
@@ -49,8 +65,23 @@ Vue.component('menu-navbar',{
                     window.location.href="index.html";     //Dá refresh na página
                 }
             });
+        },
+
+        selecionaCategoria: function(categoria){
+            this.pesquisa.categoria = categoria;
+        },
+
+        selecionaEstado: function(estado){
+            this.pesquisa.estado = estado;
+        },
+        
+        cliquePesquisa: function(){
+            location.href = 'index.html?tipoConsulta=pesquisa&item='+this.pesquisa.item+
+            '&categoria='+this.pesquisa.categoria+'&cidade='+this.pesquisa.cidade+
+            '&estado='+this.pesquisa.estado;
         }
     },
+
     created: function(){    //Verifica se o usuário está logado
         var self = this;    //Variável self para referenciar data
         if(Cookies.get('logged') == 'true'){    //Caso o usuário esteja logado
@@ -79,6 +110,7 @@ Vue.component('menu-navbar',{
             this.logged = true;     //data.logged = true
         }
     },
+
     template: 
     '<nav class="navbar navbar-default estilo-nav" id="menu">    <!--MENU-->'+
     '<div class="container-fluid">'+
@@ -87,21 +119,36 @@ Vue.component('menu-navbar',{
     '            <img src="img/orc-logo.png" style="width: 210px; vertical-align: top;">'+
     '        </a>'+
     '    </div>'+
-    '    <ul class="nav navbar-nav">'+
-    '        <li>'+
-    '           <a href="#">Categorias</a>'+
-    '       </li>'+
-    '    </ul>'+
     '    <form class="navbar-form navbar-left">'+
     '        <div class="input-group">'+
-    '            <input type="text" class="form-control" placeholder="Pesquisar">'+
+    '            <input type="text" class="form-control" placeholder="Pesquisar" v-model="pesquisa.item">'+
     '           <div class="input-group-btn">'+
-    '               <button type="submit" class="btn btn-default">'+
+    '               <button type="button" class="btn btn-default" @click="cliquePesquisa">'+
     '                   <i class="glyphicon glyphicon-search"></i>'+
     '               </button>'+
     '           </div>'+
     '       </div>'+
     '   </form>'+
+    '    <ul class="nav navbar-nav">'+
+    '       <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">'+
+    '       {{pesquisa.categoria}}<span class="caret"></span></a>'+
+    '       <ul class="dropdown-menu">'+
+    '           <li v-for="categoria in categorias">'+
+    '               <a href="#" style="color: black" @click="selecionaCategoria(categoria.nome)">'+
+    '                   {{categoria.nome}}</a>'+
+    '           </li>'+
+    '       </ul></li>'+
+    '    </ul>'+
+    '    <ul class="nav navbar-nav">'+
+    '       <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">'+
+    '       {{pesquisa.estado}}<span class="caret"></span></a>'+
+    '       <ul class="dropdown-menu estilo-navbar-scrolllist">'+
+    '           <li v-for="estado in estados">'+
+    '               <a href="#" style="color: black" @click="selecionaEstado(estado.nome)">'+
+    '               {{estado.nome}}</a>'+
+    '           </li>'+
+    '       </ul></li>'+
+    '    </ul>'+
     '   <ul class="nav navbar-nav">'+
     '       <li v-if="logged">  <!--Criar Anúncio (v-if)-->'+
     '           <a href="criar-anuncio.html">Criar Anúncio</a>'+
@@ -117,12 +164,13 @@ Vue.component('menu-navbar',{
     '   </ul>'+
     '   <ul class="nav navbar-nav navbar-right" v-else>    <!--LOGIN/CADASTRO (v-else)-->'+
     '       <li class="dropdown">'+
-    '           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Login</a>'+
+    '           <a href="#" class="dropdown-toggle" data-toggle="dropdown">'+
+    '           <span class="glyphicon glyphicon-log-in"></span> Login</a>'+
     '           <ul class="dropdown-menu" role="menu">'+
     '               <li>'+
     '                   <form style="padding: 12px">'+
     '                      <div class="form-group">'+
-    '                           <label for="inputEmail">Login</label>'+
+    '                           <label for="inputEmail"> Login</label>'+
     '                           <input type="text" class="form-control" id="inputEmail" v-model="login.email">'+
     '                       </div>'+
     '                       <div class="form-group">'+
@@ -135,13 +183,9 @@ Vue.component('menu-navbar',{
     '           </ul>'+
     '       </li>'+
     '       <li>'+
-    '           <a href="criar-conta.html">Criar Conta</a>'+
+    '           <a href="criar-conta.html"><span class="glyphicon glyphicon-user"></span> Criar Conta</a>'+
     '       </li>'+
     '   </ul>'+
     '</div>'+
     '</nav>'
 });
-
-new Vue({
-    el: '#menu-app'
-})

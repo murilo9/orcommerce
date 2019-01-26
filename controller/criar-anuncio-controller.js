@@ -1,7 +1,7 @@
 $('#confirmTable').hide();   //Esconde a tabela de confirmação
 
 var criarAnuncioController = new Vue({
-    el: '#criar-anuncio',
+    el: '#app',
     data: {
         caminhoFoto: '',
         categorias: [

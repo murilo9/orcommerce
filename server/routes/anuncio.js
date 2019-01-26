@@ -158,7 +158,45 @@ module.exports = function(app, sessionVerif){
                 break;
 
             case 'pesquisa':    //Select resultado de pesquisa
-                //TODO (a pesquisa pode ser só por nome ou incluir filtros de categoria, preço, lugar, etc)
+                //Coleta os dados da request:
+                var item = req.query.item;
+                var categoria = req.query.categoria;
+                var cidade = req.query.cidade;
+                var estado = req.query.estado;
+                //Constrói o script de pesquisa básico:
+                var sql = "SELECT * FROM tbAnuncios WHERE stNomeItem LIKE '%"+item+"%'";
+                if(categoria != 'Categorias')    //Verifica se possui algo no campo de categoria:
+                    sql += " && stCategoria='"+categoria+"'";
+                if(estado != 'Estado')      //Verifica se possui algo no campo de estado:
+                    sql += " && stEstado='"+estado+"'";
+                if(cidade != 'Cidade')      //Verifica se possui algo no campo de cidade:
+                    sql += " && stCidade='"+cidade+"'";
+                //Ordena os resultados por data:
+                sql += " ORDER BY dtData DESC";
+                console.log(sql);       //DEBUG
+                //Faz a consulta ao BD:
+                pool.query(sql, function(err, result, fields){
+                    if(err){
+                        console.log(err);
+                        res.status(500);
+                        res.end();
+                    }else{
+                        //Faz a coleta dos resultados:
+                        var anuncios = [];
+                        result.forEach(function(val, i){
+                            var anuncio = {id: '', nome: '', foto: '', cidade: '', estado: '', preco: ''};
+                            anuncio.id = result[i].itId;
+                            anuncio.url = 'anuncio.html?id='+anuncio.id;
+                            anuncio.nome = result[i].stNomeItem;
+                            anuncio.foto = 'server/anuncios/_'+anuncio.id+'/'+result[i].stFoto;
+                            anuncio.cidade = result[i].stCidade;
+                            anuncio.estado = result[i].stEstado;
+                            anuncio.preco = result[i].dcPreco;
+                            anuncios.push(anuncio);     //Armazena este anúncio no array anuncios
+                        });
+                        res.send(anuncios);
+                    }
+                });
                 break;
     
             default:

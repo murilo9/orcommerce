@@ -1,5 +1,5 @@
 var modificaController = new Vue({
-    el: '#modifica',
+    el: '#app',
     data: {
         request: {
             funcao: 'update',

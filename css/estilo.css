@@ -10,6 +10,10 @@
 .estilo-float-right{
     float: right;
 }
+.estilo-navbar-scrolllist{
+    height: 200px;
+    overflow: scroll;
+}
 #chat-conteudo{
     height: 200px;
     overflow: scroll;

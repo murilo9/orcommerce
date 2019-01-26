@@ -1,5 +1,5 @@
 var contaController = new Vue({
-    el: '#conta',
+    el: '#app',
     data: {
         estados: [
             {nome: 'Acre'},

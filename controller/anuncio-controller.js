@@ -1,5 +1,5 @@
 var anuncioController = new Vue({
-    el: '#anuncioDetalhe',
+    el: '#app',
     data: {
         chatRequest: {      //Objeto que será enviado na request ao requisitar o chat
             sessionId: Cookies.get('sessionId'), email: Cookies.get('email'), 

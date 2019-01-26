@@ -1,5 +1,5 @@
 var criarContaController = new Vue({
-    el: "#criarConta",
+    el: "#app",
     data: {
         estados: [
             {nome: 'Acre'},
